@@ -8,13 +8,13 @@ static const char *TAG = "spider-bot";
 
 #define SERVO_MIN_PULSEWIDTH_US 500
 #define SERVO_MAX_PULSEWIDTH_US 2500
-#define SERVO_MAX_DEGREE        180
+#define SERVO_MAX_DEGREE        90
 
 #define LEDC_MODE           LEDC_LOW_SPEED_MODE
 #define LEDC_DUTY_RES       LEDC_TIMER_14_BIT
 #define LEDC_FREQUENCY      50
 
-#define SERVO_GPIO          4  // GPIO 4
+#define SERVO_GPIO          3 // GPIO 4
 
 static uint32_t angle_to_duty(uint32_t angle) {
     uint32_t pulse_us = SERVO_MIN_PULSEWIDTH_US +
@@ -24,7 +24,7 @@ static uint32_t angle_to_duty(uint32_t angle) {
 }
 
 void app_main(void) {
-    ESP_LOGI(TAG, "Spider-Bot - demarrage");
+    ESP_LOGI(TAG, "Spider-Bot demarrage !");
 
     // Attendre 3 secondes pour laisser l'USB CDC s'initialiser
     vTaskDelay(pdMS_TO_TICKS(3000));
