@@ -21,20 +21,19 @@ static const int servo_gpios[NUM_SERVOS] = {
 
 typedef struct {
     const char *name;
-    int hip;            // index servo hanche
-    int leg;            // index servo jambe
-    int hip_base;       // angle de base hanche
-    int hip_range;      // amplitude hanche (positif = vers exterieur)
-    int leg_base;       // angle de base jambe
-    int leg_range;      // amplitude jambe (positif = lever)
+    int hip;
+    int leg;
+    int hip_base;
+    int hip_range;      // positif = hanche va vers exterieur (base - range)
+    int leg_base;
+    int leg_range;      // sens OPPOSE a la hanche (base + range)
 } leg_t;
 
-// Ajuste hip_base, hip_range, leg_base, leg_range par patte
 static leg_t legs[NUM_LEGS] = {
-    { "Avant Droite",   0, 1, 90, 20, 90, 25 },   // R1 + R2
-    { "Avant Gauche",   2, 3, 90, 20, 90, 25 },   // L1 + L2
-    { "Arriere Droite", 5, 4, 90, 15, 90, 15 },    // R3 + R4
-    { "Arriere Gauche", 6, 7, 90, 15, 90, 15 },    // L3 + L4
+    { "Avant Droite",   0, 1, 80, -30, 100, -30 },  // R1+R2 inversés
+    { "Avant Gauche",   2, 3, 80, 30, 100, 30 },     // OK
+    { "Arriere Droite", 5, 4, 85, 20, 95,  20 },     // a tester
+    { "Arriere Gauche", 6, 7, 85, 20, 95, -20 },     // L4 inversé
 };
 
 static int servo_angles[NUM_SERVOS];
@@ -61,12 +60,14 @@ static void servo_move_smooth(int id, int target) {
 }
 
 static void all_base(void) {
-    ESP_LOGI(TAG, "Position de base");
+    ESP_LOGI(TAG, "=== SETUP POSITION DE BASE ===");
     for (int i = 0; i < NUM_LEGS; i++) {
+        ESP_LOGI(TAG, "  %s : hanche=%d, jambe=%d",
+                legs[i].name, legs[i].hip_base, legs[i].leg_base);
         servo_move_smooth(legs[i].hip, legs[i].hip_base);
         servo_move_smooth(legs[i].leg, legs[i].leg_base);
     }
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
 void app_main(void) {
@@ -96,38 +97,46 @@ void app_main(void) {
         servo_angles[i] = 90;
     }
 
+    // SETUP : position de base visible
     all_base();
-    vTaskDelay(pdMS_TO_TICKS(2000));
+    ESP_LOGI(TAG, "=== Base OK, attente 3s avant test ===");
+    vTaskDelay(pdMS_TO_TICKS(3000));
 
     while (1) {
         for (int i = 0; i < NUM_LEGS; i++) {
-            int hip_out = legs[i].hip_base - legs[i].hip_range;
-            int leg_up  = legs[i].leg_base - legs[i].leg_range;
+            // Hanche va vers exterieur : base - range
+            int hip_move = legs[i].hip_base - legs[i].hip_range;
+            // Jambe va dans le sens OPPOSE : base + range
+            int leg_move = legs[i].leg_base + legs[i].leg_range;
 
-            ESP_LOGI(TAG, "=== %s (hanche %d->%d, jambe %d->%d) ===",
-                     legs[i].name,
-                     legs[i].hip_base, hip_out,
-                     legs[i].leg_base, leg_up);
+            ESP_LOGI(TAG, "=== %s ===", legs[i].name);
+            ESP_LOGI(TAG, "  Hanche %d -> %d, Jambe %d -> %d",
+                    legs[i].hip_base, hip_move,
+                    legs[i].leg_base, leg_move);
 
-            // 1. Lever la jambe
-            servo_move_smooth(legs[i].leg, leg_up);
+            // 1. Lever la jambe (sens oppose a la hanche)
+            ESP_LOGI(TAG, "  Lever jambe");
+            servo_move_smooth(legs[i].leg, leg_move);
             vTaskDelay(pdMS_TO_TICKS(300));
 
             // 2. Hanche vers exterieur
-            servo_move_smooth(legs[i].hip, hip_out);
+            ESP_LOGI(TAG, "  Hanche exterieur");
+            servo_move_smooth(legs[i].hip, hip_move);
             vTaskDelay(pdMS_TO_TICKS(300));
 
             // 3. Poser la jambe
+            ESP_LOGI(TAG, "  Poser jambe");
             servo_move_smooth(legs[i].leg, legs[i].leg_base);
             vTaskDelay(pdMS_TO_TICKS(300));
 
-            // 4. Retour base
+            // 4. Retour hanche a la base
+            ESP_LOGI(TAG, "  Retour base");
             servo_move_smooth(legs[i].hip, legs[i].hip_base);
             vTaskDelay(pdMS_TO_TICKS(500));
         }
 
-        ESP_LOGI(TAG, "=== Cycle termine ===");
+        ESP_LOGI(TAG, "=== Cycle termine, retour base ===");
         all_base();
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(3000));
     }
 }
