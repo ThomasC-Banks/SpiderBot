@@ -14,8 +14,8 @@ static const char *TAG = "face";
 #define OLED_H   64
 
 static ssd1306_handle_t oled = NULL;
+static uint8_t framebuf[OLED_W * (OLED_H / 8)];
 
-// Dessine un cercle rempli (yeux)
 static void draw_filled_circle(uint8_t *buf, int cx, int cy, int r) {
     for (int y = -r; y <= r; y++) {
         for (int x = -r; x <= r; x++) {
@@ -30,7 +30,6 @@ static void draw_filled_circle(uint8_t *buf, int cx, int cy, int r) {
     }
 }
 
-// Dessine un rectangle rempli
 static void draw_filled_rect(uint8_t *buf, int x0, int y0, int w, int h) {
     for (int y = y0; y < y0 + h && y < OLED_H; y++) {
         for (int x = x0; x < x0 + w && x < OLED_W; x++) {
@@ -41,7 +40,6 @@ static void draw_filled_rect(uint8_t *buf, int x0, int y0, int w, int h) {
     }
 }
 
-// Efface un rectangle (pour faire les paupieres)
 static void clear_rect(uint8_t *buf, int x0, int y0, int w, int h) {
     for (int y = y0; y < y0 + h && y < OLED_H; y++) {
         for (int x = x0; x < x0 + w && x < OLED_W; x++) {
@@ -51,8 +49,6 @@ static void clear_rect(uint8_t *buf, int x0, int y0, int w, int h) {
         }
     }
 }
-
-static uint8_t framebuf[OLED_W * (OLED_H / 8)];
 
 static void clear_buf(void) {
     memset(framebuf, 0, sizeof(framebuf));
@@ -90,20 +86,17 @@ void face_init(void) {
     face_normal();
 }
 
-// Yeux normaux : deux gros cercles
 void face_normal(void) {
     clear_buf();
-    draw_filled_circle(framebuf, 35, 32, 12);  // oeil gauche
-    draw_filled_circle(framebuf, 93, 32, 12);  // oeil droit
+    draw_filled_circle(framebuf, 35, 32, 12);
+    draw_filled_circle(framebuf, 93, 32, 12);
     flush_buf();
 }
 
-// Content : yeux + bouche souriante
 void face_happy(void) {
     clear_buf();
     draw_filled_circle(framebuf, 35, 28, 12);
     draw_filled_circle(framebuf, 93, 28, 12);
-    // Sourire
     for (int x = 30; x <= 98; x++) {
         int y = 50 + (x - 64) * (x - 64) / 200;
         if (y < OLED_H) {
@@ -113,15 +106,13 @@ void face_happy(void) {
     flush_buf();
 }
 
-// Clignement : yeux fermes (lignes horizontales)
 void face_blink(void) {
     clear_buf();
-    draw_filled_rect(framebuf, 23, 30, 24, 4);  // oeil gauche ferme
-    draw_filled_rect(framebuf, 81, 30, 24, 4);  // oeil droit ferme
+    draw_filled_rect(framebuf, 23, 30, 24, 4);
+    draw_filled_rect(framebuf, 81, 30, 24, 4);
     flush_buf();
 }
 
-// Regarde a gauche
 void face_look_left(void) {
     clear_buf();
     draw_filled_circle(framebuf, 30, 32, 12);
@@ -129,7 +120,6 @@ void face_look_left(void) {
     flush_buf();
 }
 
-// Regarde a droite
 void face_look_right(void) {
     clear_buf();
     draw_filled_circle(framebuf, 40, 32, 12);
@@ -137,18 +127,15 @@ void face_look_right(void) {
     flush_buf();
 }
 
-// Endormi : yeux mi-clos
 void face_sleepy(void) {
     clear_buf();
     draw_filled_circle(framebuf, 35, 35, 12);
     draw_filled_circle(framebuf, 93, 35, 12);
-    // Paupieres
     clear_rect(framebuf, 20, 0, 35, 32);
     clear_rect(framebuf, 78, 0, 35, 32);
     flush_buf();
 }
 
-// Excite : gros yeux
 void face_excited(void) {
     clear_buf();
     draw_filled_circle(framebuf, 35, 32, 16);
@@ -156,10 +143,9 @@ void face_excited(void) {
     flush_buf();
 }
 
-// Clin d'oeil
 void face_wink(void) {
     clear_buf();
-    draw_filled_circle(framebuf, 35, 32, 12);        // oeil gauche ouvert
-    draw_filled_rect(framebuf, 81, 30, 24, 4);       // oeil droit ferme
+    draw_filled_circle(framebuf, 35, 32, 12);
+    draw_filled_rect(framebuf, 81, 30, 24, 4);
     flush_buf();
 }
