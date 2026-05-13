@@ -18,60 +18,32 @@ void app_main(void) {
 
     servo_init();
     face_init();
-    all_neutral();
     face_normal();
+    all_neutral();
     wait(2000);
 
     while (1) {
-        face_happy();
         dance_wave();
-        wait(500);
-
-        face_look_left();
+        wait(1000);
         dance_twist();
-        wait(500);
-
-        face_excited();
+        wait(1000);
         dance_bounce();
-        wait(500);
-
-        face_sleepy();
+        wait(1000);
         dance_pushup();
-        wait(500);
-
-        face_wink();
+        wait(1000);
         dance_wiggle();
-        wait(500);
-
-        face_look_right();
+        wait(1000);
         dance_shimmy();
-        wait(500);
-
-        face_normal();
+        wait(1000);
         dance_spin();
-        wait(500);
-
-        face_excited();
+        wait(1000);
         dance_legs_up();
-        wait(500);
-
-        face_happy();
+        wait(1000);
         dance_mexican_wave();
-        wait(500);
-
-        face_wink();
+        wait(1000);
         dance_six_seven();
-        wait(500);
-
-        face_blink();
-        wait(300);
-        face_normal();
-        wait(300);
-        face_blink();
-        wait(300);
-
+        wait(1000);
         all_neutral();
-        face_normal();
         ESP_LOGI(TAG, "=== REPLAY ===");
         wait(3000);
     }
