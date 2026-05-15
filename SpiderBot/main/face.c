@@ -16,30 +16,6 @@ static const char *TAG = "face";
 
 static ssd1306_handle_t oled = NULL;
 
-static void draw_filled_circle(int cx, int cy, int r) {
-    for (int y = -r; y <= r; y++) {
-        for (int x = -r; x <= r; x++) {
-            if (x * x + y * y <= r * r) {
-                int px = cx + x;
-                int py = cy + y;
-                if (px >= 0 && px < OLED_W && py >= 0 && py < OLED_H) {
-                    ssd1306_fill_point(oled, px, py, 1);
-                }
-            }
-        }
-    }
-}
-
-static void clear_rect(int x0, int y0, int w, int h) {
-    for (int y = y0; y < y0 + h && y < OLED_H; y++) {
-        for (int x = x0; x < x0 + w && x < OLED_W; x++) {
-            if (x >= 0 && y >= 0) {
-                ssd1306_fill_point(oled, x, y, 0);
-            }
-        }
-    }
-}
-
 static void clear_screen(void) {
     ssd1306_clear_screen(oled, 0x00);
 }
@@ -71,19 +47,8 @@ void face_init(void) {
 
 void face_normal(void) {
     clear_screen();
-    // Yeux
-    draw_filled_circle(35, 22, 10);
-    draw_filled_circle(93, 22, 10);
-    // Pupilles
-    clear_rect(33, 20, 5, 5);
-    clear_rect(91, 20, 5, 5);
-    // Sourire
-    for (int x = 35; x <= 93; x++) {
-        int y = 48 + (x - 64) * (x - 64) / 150;
-        if (y < OLED_H && y >= 0) {
-            ssd1306_fill_point(oled, x, y, 1);
-            ssd1306_fill_point(oled, x, y + 1, 1);
-        }
-    }
+    ssd1306_draw_string(oled, 20, 0,  (const uint8_t *)"DAMIEN", 16, 1);
+    ssd1306_draw_string(oled, 16, 24, (const uint8_t *)"  O    O  ", 16, 1);
+    ssd1306_draw_string(oled, 16, 40, (const uint8_t *)"  \\____/  ", 16, 1);
     refresh();
 }

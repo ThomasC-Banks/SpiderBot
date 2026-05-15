@@ -15,13 +15,10 @@ static void wait(int ms) {
 void app_main(void) {
     ESP_LOGI(TAG, "Spider-Bot DANCE MODE");
     vTaskDelay(pdMS_TO_TICKS(3000));
-
     servo_init();
     face_init();
-    face_normal();
     all_neutral();
     wait(2000);
-
     while (1) {
         dance_wave();
         wait(1000);
