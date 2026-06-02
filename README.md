@@ -5,7 +5,7 @@
 
 <br/>
 
-# 🕷️ Spider-Bot — Robot araignée 8 pattes sur ESP32-S2
+# 🕷️ Spider-Bot: Robot araignée 8 pattes sur ESP32-S2
 
 **TIC-RBT1 · Projet 3 · ETNA**
 
